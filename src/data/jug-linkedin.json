@@ -1,0 +1,36 @@
+[
+  {
+    "command": "open_tab",
+    "url": "https://www.linkedin.com/search/results/all/?keywords={{keywords}}"
+  },
+  {
+    "command": "send_event",
+    "event": "scroll",
+    "data": {
+      "scrollDistance": 1000
+    }
+  },
+  {
+    "command": "click",
+    "selector": "#ember18"
+  },
+  {
+    "command": "highlight",
+    "selector": ".t-12.t-black--light.mb2.mh4"
+  },
+  {
+    "command": "scrape",
+    "xpath": "/html/body/div[4]/div[3]/div[2]/div/div[1]/main/div/div/div[2]/div/ul[2]"
+  },
+  {
+    "command": "screenshot"
+  },
+  {
+    "command": "hitEnter",
+    "selector": ".search-global-typeahead__input"
+  },
+  {
+    "command": "wait",
+    "time": 2000
+  }
+]
