@@ -1,27 +1,57 @@
 // Listen for any custom event starting with 'jug-'
-window.addEventListener("message", (event) => {
-  console.log("ccc 1");
-  // Check if event data is an object and has the event key starting with 'jug-'
-  if (
-    typeof event.data === "object" &&
-    Object.prototype.hasOwnProperty.call(event.data, "event") &&
-    event.data.event.startsWith("jug-")
-  ) {
-    // Send the event data to the background script
-    console.log({ event });
-    chrome.runtime.sendMessage(event.data);
-  }
-});
+// window.addEventListener("message", (event) => {
+//   // Check if event data is an object and has the event key starting with 'jug-'
+//   if (
+//     typeof event.data === "object" &&
+//     Object.prototype.hasOwnProperty.call(event.data, "event") &&
+//     event.data.event.startsWith("jug-")
+//   ) {
+//     // Send the event data to the background script
+//     console.log({ event });
+//     chrome.runtime.sendMessage(event.data);
+//   }
+// });
+
 console.log("content script from vue");
+// function getElementXPath(element) {
+//   if (element && element.tagName) {
+//     var xpath = "";
+//     for (; element && element.nodeType == 1; element = element.parentNode) {
+//       var id =
+//         Array.from(element.parentNode.children)
+//           .filter(function (sibling) {
+//             return sibling.tagName === element.tagName;
+//           })
+//           .indexOf(element) + 1;
+//       id > 1 ? (id = "[" + id + "]") : (id = "");
+//       xpath = "/" + element.tagName.toLowerCase() + id + xpath;
+//     }
+//     return xpath;
+//   }
+//   return "";
+// }
+// function getXPathInTab(tabId, selector) {
+//   chrome.tabs.get(tabId, function (tab) {
+//     if (chrome.runtime.lastError) {
+//       console.error(chrome.runtime.lastError.message, tab);
+//       return;
+//     }
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  const { selector } = message;
-  const element = document.querySelector(selector);
+//     chrome.tabs.executeScript(tabId, { code: "document.querySelector('" + selector + "')" }, function (results) {
+//       if (chrome.runtime.lastError) {
+//         console.error(chrome.runtime.lastError.message);
+//         return;
+//       }
 
-  if (element) {
-    element.style.border = "2px solid yellow";
-    // Add any additional highlighting logic as needed
-  }
+//       var element = results[0];
+//       var xpath = getElementXPath(element);
+//       console.log("XPath:", xpath);
+//       // Do something with the XPath here
+//     });
+//   });
+// }
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  console.log({ message });
 
-  sendResponse();
+  sendResponse("Message received!");
 });

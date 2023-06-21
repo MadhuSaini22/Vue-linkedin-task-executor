@@ -12,18 +12,17 @@ export default {
   name: "App",
   components: { HelloWorld },
   mounted() {
-    console.log("first 1");
     const customEventButton = document.getElementById("customEventButton");
     customEventButton.addEventListener("click", () => {
-      if (chrome.runtime.lastError) return;
+      // if (chrome.runtime.lastError) return;
       const eventData = {
         event: "jug-linkedin",
         data: {
           keywords: "example search",
         },
       };
+      console.log("clicked");
       chrome.runtime.sendMessage(eventData);
-      return true;
     });
 
     // // Listen for the results event

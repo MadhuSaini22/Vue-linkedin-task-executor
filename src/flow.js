@@ -46,7 +46,6 @@ const screenshot = async (tabId) => {
             chrome.debugger.detach({ tabId }, () => {
               if (data) {
                 const screenshotUrl = `data:image/png;base64,${data}`;
-                console.log("Screenshot captured:", screenshotUrl);
 
                 resolve(screenshotUrl);
               } else {
@@ -74,34 +73,120 @@ const highlight = async (tabId, selector) => {
     }
   `,
   });
+
   console.log("highlight close");
 };
 
-const scrape = async (tabId, xpath) => {
-  console.log("scrape open");
+// function getElementXPath(element) {
+//   if (element && element.tagName) {
+//     var xpath = "";
+//     for (; element && element.nodeType == 1; element = element.parentNode) {
+//       var id =
+//         Array.from(element.parentNode.children)
+//           .filter(function (sibling) {
+//             return sibling.tagName === element.tagName;
+//           })
+//           .indexOf(element) + 1;
+//       id > 1 ? (id = "[" + id + "]") : (id = "");
+//       xpath = "/" + element.tagName.toLowerCase() + id + xpath;
+//     }
+//     return xpath;
+//   }
+//   return "";
+// }
 
-  return new Promise((resolve, reject) => {
-    chrome.tabs.executeScript(
-      tabId,
-      {
-        code: ` document.evaluate('${xpath}', document, null, XPathResult.ANY_TYPE, null)`,
-      },
-      (result) => {
-        if (chrome.runtime.lastError) {
-          reject(chrome.runtime.lastError);
-        } else {
-          console.log({ result });
-          resolve(result[0]);
-        }
-      }
-    );
-  });
-};
+// // Function to get XPath of an element in a specific tab
+// function getXPathInTab(tabId, selector) {
+//   chrome.tabs.get(tabId, function (tab) {
+//     if (chrome.runtime.lastError) {
+//       console.error(chrome.runtime.lastError.message, tab);
+//       return;
+//     }
+
+//     chrome.tabs.executeScript(tabId, { code: "document.querySelector('" + selector + "')" }, function (results) {
+//       if (chrome.runtime.lastError) {
+//         console.error(chrome.runtime.lastError.message);
+//         return;
+//       }
+
+//       var element = results[0];
+//       var xpath = getElementXPath(element);
+//       console.log("XPath:", xpath);
+//       // Do something with the XPath here
+//     });
+//   });
+// }
+
+// const getElementXPath = (selector) => {
+//   const element = document.querySelector(selector);
+
+//   if (!element) {
+//     console.error("Element not found");
+//     return;
+//   }
+
+//   if (element.id !== "") {
+//     // If the element has an ID, use it to construct the XPath
+//     return `id("${element.id}")`;
+//   }
+
+//   const paths = [];
+
+//   // Iterate through ancestors of the element
+//   for (; element && element.nodeType === Node.ELEMENT_NODE; element = element.parentNode) {
+//     let tagName = element.tagName.toLowerCase();
+//     let index = 1;
+
+//     // Check if the element has siblings with the same tag name
+//     if (element.parentNode && element.parentNode.children) {
+//       const siblings = element.parentNode.children;
+//       for (let i = 0; i < siblings.length; i++) {
+//         const sibling = siblings[i];
+//         if (sibling.tagName === tagName) {
+//           if (sibling === element) {
+//             break;
+//           }
+//           index++;
+//         }
+//       }
+//     }
+
+//     // Add the tag name and index to the XPath
+//     let pathIndex = index > 1 ? `[${index}]` : "";
+//     paths.splice(0, 0, tagName + pathIndex);
+//   }
+
+//   // Join the XPath parts and return the final XPath
+//   return paths.length ? `/${paths.join("/")}` : null;
+// };
+
+// const scrape = async (tabId, xpath) => {
+//   console.log("scrape open");
+
+//   return new Promise((resolve, reject) => {
+//     chrome.tabs.executeScript(
+//       tabId,
+//       {
+//         code: `
+//       const result = document.evaluate('${xpath}', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+//       result.singleNodeValue ? result.singleNodeValue.textContent : null;
+//     `,
+//       },
+//       (result) => {
+//         if (chrome.runtime.lastError) {
+//           reject(chrome.runtime.lastError);
+//         } else {
+//           resolve(result[0]);
+//         }
+//       }
+//     );
+//   });
+// };
 
 export async function handleFlow(request, sender) {
   console.log({ sender });
   const commands = await fetch(chrome.runtime.getURL(`data/${request.event}.json`)).then((response) => response.json());
-  console.log({ commands });
+  // console.log({ commands });
   let state = {};
 
   for (let command of commands) {
@@ -127,7 +212,16 @@ export async function handleFlow(request, sender) {
         await highlight(state.lastTabId, command.selector);
         break;
       case "scrape":
-        state.scrapedData = await scrape(state.lastTabId, command.xpath);
+        // state.scrapedData = await getXPathInTab(state.lastTabId, command.selector);
+        // Function to get the XPath of an element
+
+        // Function to send a message to the content script and retrieve the XPath
+        // chrome.tabs.sendMessage(state.lastTabId, command.selector, (response) => {
+        //   console.log("XPath:", response);
+        // });
+        chrome.runtime.sendMessage({ message: "Hello from the background scriptSDSSSSSSdd!" });
+
+        // await scrape(state.lastTabId, command.xpath);
         break;
       case "send_event":
         chrome.tabs.query({}, (tabs) =>
