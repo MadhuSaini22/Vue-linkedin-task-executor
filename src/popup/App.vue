@@ -21,7 +21,6 @@ export default {
           keywords: "example search",
         },
       };
-      console.log("clicked");
       chrome.runtime.sendMessage(eventData);
     });
 

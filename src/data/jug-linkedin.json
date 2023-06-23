@@ -19,16 +19,17 @@
     "selector": ".t-12.t-black--light.mb2.mh4"
   },
   {
+    "command": "hitEnter",
+    "selector": ".search-global-typeahead__input"
+  },
+  {
     "command": "scrape",
-    "selector": ".t-12.t-black--light.mb2.mh4"
+    "selector": ".relative.entity-result__content-summary.entity-result--no-ellipsis.t-14.mb2"
   },
   {
     "command": "screenshot"
   },
-  {
-    "command": "hitEnter",
-    "selector": ".search-global-typeahead__input"
-  },
+
   {
     "command": "wait",
     "time": 2000

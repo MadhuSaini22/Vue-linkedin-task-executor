@@ -1,20 +1,15 @@
 import Handlebars from "handlebars/lib/handlebars";
 
 const click = async (tabId, selector) => {
-  console.log("clicked called");
-
   chrome.tabs.get(tabId, function (tab) {
     console.log(tab);
     chrome.tabs.executeScript(tabId, {
       code: `document.querySelector("${selector}").click();`,
     });
   });
-  console.log("clicked closing");
 };
 
 const hitEnter = async (tabId, selector) => {
-  console.log("hitEnter open");
-
   chrome.tabs.executeScript(tabId, {
     code: `
     var element = document.querySelector('${selector}');
@@ -26,12 +21,9 @@ const hitEnter = async (tabId, selector) => {
     element.dispatchEvent(event);
   `,
   });
-  console.log("hitEnter close");
 };
 
 const screenshot = async (tabId) => {
-  console.log("screenshot open");
-
   return new Promise((resolve, reject) => {
     chrome.debugger.attach({ tabId }, "1.2", () => {
       chrome.debugger.sendCommand({ tabId }, "Page.enable", {}, () => {
@@ -49,9 +41,7 @@ const screenshot = async (tabId) => {
 
                 resolve(screenshotUrl);
               } else {
-                console.error(
-                  "Failed to capture screenshot: Data is undefined"
-                );
+                console.error("Failed to capture screenshot: Data is undefined");
                 reject(new Error("Failed to capture screenshot"));
               }
             });
@@ -63,8 +53,6 @@ const screenshot = async (tabId) => {
 };
 
 const highlight = async (tabId, selector) => {
-  console.log("highlight open");
-
   chrome.tabs.executeScript(tabId, {
     code: `
     var elements = document.querySelectorAll('${selector}');
@@ -75,46 +63,36 @@ const highlight = async (tabId, selector) => {
     }
   `,
   });
-
-  console.log("highlight close");
 };
 
-async function scrape(tabId, elementSelector) {
-  chrome.tabs.sendMessage(
-    tabId,
-    { selector: elementSelector },
-    function (response) {
-      if (chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError);
-        return;
+async function scrape(tabId, elementSelector, request, state) {
+  return new Promise((resolve) => {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.from === "content") {
+        sendResponse({ tabId, elementSelector });
+      } else if (message.message === "contentToBackgroundResponse") {
+        state.scrapedData = message.data;
+        sendResponse({ event: `${request.event}-result`, state });
+        resolve(message.data);
       }
-
-      if (response && response.data) {
-        console.log(response.data); // Do something with the scraped data
-      } else {
-        console.error("Scraping failed. No data received.");
-      }
-    }
-  );
+      return true;
+    });
+  });
 }
+
 export async function handleFlow(request, sender) {
-  console.log({ sender });
-  const commands = await fetch(
-    chrome.runtime.getURL(`data/${request.event}.json`)
-  ).then((response) => response.json());
-  // console.log({ commands });
+  console.log(sender);
+  const commands = await fetch(chrome.runtime.getURL(`data/${request.event}.json`)).then((response) => response.json());
   let state = {};
 
   for (let command of commands) {
     let template = Handlebars.compile(command.url || "");
     let url = template(request.data);
-    let tab; // Move the declaration outside the switch block
+    let tab;
 
     switch (command.command) {
       case "open_tab":
-        tab = await new Promise((resolve) =>
-          chrome.tabs.create({ url: url }, resolve)
-        );
+        tab = await new Promise((resolve) => chrome.tabs.create({ url: url }, resolve));
         state.lastTabId = tab.id;
         break;
       case "click":
@@ -130,7 +108,7 @@ export async function handleFlow(request, sender) {
         await highlight(state.lastTabId, command.selector);
         break;
       case "scrape":
-        state.scrapedData = await scrape(state.lastTabId, command.selector);
+        state.scrapedData = await scrape(state.lastTabId, command.selector, request, state);
 
         break;
       case "send_event":
@@ -148,6 +126,4 @@ export async function handleFlow(request, sender) {
         break;
     }
   }
-  console.log({ state });
-  chrome.runtime.sendMessage({ event: `${request.event}-result`, state });
 }
