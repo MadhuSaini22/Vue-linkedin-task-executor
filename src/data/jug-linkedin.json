@@ -20,7 +20,7 @@
   },
   {
     "command": "scrape",
-    "xpath": "/html/body/div[4]/div[3]/div[2]/div/div[1]/main/div/div/div[2]/div/ul[2]"
+    "selector": ".t-12.t-black--light.mb2.mh4"
   },
   {
     "command": "screenshot"

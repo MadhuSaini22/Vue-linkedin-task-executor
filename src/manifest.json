@@ -10,7 +10,6 @@
     "scripting",
     "tabs",
     "pageCapture",
-    "<all_urls>",
     "*://*/*",
     "http://*/*",
     "devtools://*/*",

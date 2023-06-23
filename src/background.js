@@ -1,3 +1,5 @@
+// import { handleFlow } from "./flow";
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.event && message.event.startsWith("jug-")) {
     // Process the message or perform any necessary actions
@@ -16,7 +18,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
-chrome.tabs.query({ active: true, currentWindow: true, lastFocusedWindow: true }, function (tabs) {
+// Background script (background.js)
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
   console.log(tabs);
-  chrome.tabs.sendMessage(tabs[0].id, { greeting: "Hello from background script!" });
+  const tab = tabs[0];
+  chrome.tabs.sendMessage(tab.id, { message: "hello" });
 });

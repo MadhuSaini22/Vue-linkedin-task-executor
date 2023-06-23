@@ -13,45 +13,34 @@
 // });
 
 console.log("content script from vue");
-// function getElementXPath(element) {
-//   if (element && element.tagName) {
-//     var xpath = "";
-//     for (; element && element.nodeType == 1; element = element.parentNode) {
-//       var id =
-//         Array.from(element.parentNode.children)
-//           .filter(function (sibling) {
-//             return sibling.tagName === element.tagName;
-//           })
-//           .indexOf(element) + 1;
-//       id > 1 ? (id = "[" + id + "]") : (id = "");
-//       xpath = "/" + element.tagName.toLowerCase() + id + xpath;
-//     }
-//     return xpath;
-//   }
-//   return "";
-// }
-// function getXPathInTab(tabId, selector) {
-//   chrome.tabs.get(tabId, function (tab) {
-//     if (chrome.runtime.lastError) {
-//       console.error(chrome.runtime.lastError.message, tab);
-//       return;
-//     }
 
-//     chrome.tabs.executeScript(tabId, { code: "document.querySelector('" + selector + "')" }, function (results) {
-//       if (chrome.runtime.lastError) {
-//         console.error(chrome.runtime.lastError.message);
-//         return;
-//       }
-
-//       var element = results[0];
-//       var xpath = getElementXPath(element);
-//       console.log("XPath:", xpath);
-//       // Do something with the XPath here
-//     });
-//   });
-// }
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  console.log({ message });
-
-  sendResponse("Message received!");
+// Content script (content-script.js)
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  console.log({ sender, sendResponse });
+  if (request.message === "hello") {
+    console.log('Received "hello" message from background script');
+    // Do something in response to the message
+  }
 });
+
+// console.log("firstssssssssssssssssssssssss");
+// chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+//   console.log("ddddddddddddddddddddddddddddddddddddd");
+//   if (request.selector) {
+//     var xpathResult = document.evaluate(
+//       request.selector,
+//       document,
+//       null,
+//       XPathResult.ANY_TYPE,
+//       null
+//     );
+//     var nodes = [];
+//     var node;
+
+//     while ((node = xpathResult.iterateNext())) {
+//       nodes.push(node.textContent);
+//     }
+
+//     sendResponse({ data: nodes });
+//   }
+// });
